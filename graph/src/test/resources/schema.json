@@ -1,0 +1,36 @@
+{
+  "gates": [
+    {
+      "id": "action",
+      "properties": [
+        {
+          "type": "event",
+          "id": "execute"
+        }
+      ]
+    },
+    {
+      "id": "text",
+      "properties": [
+        {
+          "type": "output",
+          "id": "value"
+        }
+      ]
+    },
+    {
+      "id": "print",
+      "properties": [
+        {
+          "type": "command",
+          "id": "print"
+        },
+        {
+          "type": "input",
+          "data": "string",
+          "id": "content"
+        }
+      ]
+    }
+  ]
+}

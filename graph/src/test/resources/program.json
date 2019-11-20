@@ -1,0 +1,28 @@
+{
+  "gates": [
+    {
+      "id": "action",
+      "key": "a1"
+    },
+    {
+      "id": "print",
+      "key": "p1"
+    },
+    {
+      "id": "text",
+      "key": "t1"
+    }
+  ],
+  "edges": [
+    {
+      "source": {
+        "nodeKey": "a1",
+        "propertyId": "execute"
+      },
+      "target": {
+        "nodeKey": "p1",
+        "propertyId": "print"
+      }
+    }
+  ]
+}
