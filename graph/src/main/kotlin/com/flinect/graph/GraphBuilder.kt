@@ -4,17 +4,17 @@ package com.flinect.graph
 class GraphBuilder private constructor() {
     private val nodes = HashMap<String, Node>()
 
-    fun gate(id: String, f: GateBuilder.() -> Unit) {
+    fun gate(id: String, f: GateBuilder.() -> Unit = {}) {
         require(!nodes.containsKey(id)) { "Node id '$id' is taken." }
         nodes[id] = GateBuilder.create(id, f)
     }
 
-    fun structure(id: String, f: StructureBuilder.() -> Unit) {
+    fun structure(id: String, f: StructureBuilder.() -> Unit = {}) {
         require(!nodes.containsKey(id)) { "Node id '$id' is taken." }
         nodes[id] = StructureBuilder.create(id, f)
     }
 
-    fun build() = Graph(nodes)
+    private fun build() = Graph(nodes)
 
     companion object {
         fun create(f: GraphBuilder.() -> Unit): Graph {
@@ -55,7 +55,7 @@ class GateBuilder(private val id: String) {
         require(!properties.containsKey(property.id)) { "Property id '${property.id}' is taken." }
     }
 
-    fun build() = Gate(id, properties)
+    private fun build() = Gate(id, properties)
 
     companion object {
         fun create(id: String, f: GateBuilder.() -> Unit): Gate {
@@ -74,7 +74,7 @@ class StructureBuilder(private val id: String) {
         properties[id] = property
     }
 
-    fun build() = Structure(id, properties)
+    private fun build() = Structure(id, properties)
 
     companion object {
         fun create(id: String, f: StructureBuilder.() -> Unit): Structure {
