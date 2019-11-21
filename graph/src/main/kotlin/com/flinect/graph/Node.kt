@@ -1,5 +1,6 @@
 package com.flinect.graph
 
-abstract class Node {
-    abstract val id: String
-}
+data class Node(
+    val id: String,
+    val properties: Map<String, Property>
+)

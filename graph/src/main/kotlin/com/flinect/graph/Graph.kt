@@ -1,4 +1,5 @@
 package com.flinect.graph
 
-class Graph {
-}
+data class Graph(
+    val nodes: Map<String, Node>
+)

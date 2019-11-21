@@ -25,6 +25,14 @@ subprojects {
     repositories {
         mavenCentral()
         jcenter()
+        maven {
+            name = "GitHubPackages"
+            url = uri(property("maven-repository").toString())
+            credentials {
+                username = project.findProperty("github.user") as String? ?: System.getenv("GITHUB_USER")
+                password = project.findProperty("github.token") as String? ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 
     dependencies {
