@@ -1,7 +1,16 @@
 package com.flinect.graph
 
-data class Instance(
-    val node: Node,
-    val key: String,
-    val propertyValues: Map<String, PropertyValue>
-)
+abstract class Instance(val key: String) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Instance) return false
+
+        if (key != other.key) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return key.hashCode()
+    }
+}

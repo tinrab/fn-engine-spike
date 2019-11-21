@@ -4,9 +4,14 @@ package com.flinect.graph
 class GraphBuilder private constructor() {
     private val nodes = HashMap<String, Node>()
 
-    fun node(id: String, f: NodeBuilder.() -> Unit) {
+    fun gate(id: String, f: GateBuilder.() -> Unit) {
         require(!nodes.containsKey(id)) { "Node id '$id' is taken." }
-        nodes[id] = NodeBuilder(id).apply(f).build()
+        nodes[id] = GateBuilder.create(id, f)
+    }
+
+    fun structure(id: String, f: StructureBuilder.() -> Unit) {
+        require(!nodes.containsKey(id)) { "Node id '$id' is taken." }
+        nodes[id] = StructureBuilder.create(id, f)
     }
 
     fun build() = Graph(nodes)
@@ -19,52 +24,61 @@ class GraphBuilder private constructor() {
 }
 
 @GraphDsl
-class NodeBuilder(private val id: String) {
+class GateBuilder(private val id: String) {
     private val properties = HashMap<String, Property>()
 
-    fun input(id: String, type: DataType, f: PropertyBuilder.() -> Unit = {}) {
-        val property = PropertyBuilder(id, Property.Kind.INPUT, type).apply(f).build()
+    fun input(id: String, type: DataType) {
+        val property = DataProperty(id, Direction.IN, type)
         validateNewProperty(property)
         properties[id] = property
     }
 
-    fun output(id: String, type: DataType, f: PropertyBuilder.() -> Unit = {}) {
-        val property = PropertyBuilder(id, Property.Kind.OUTPUT, type).apply(f).build()
+    fun output(id: String, type: DataType) {
+        val property = DataProperty(id, Direction.OUT, type)
         validateNewProperty(property)
         properties[id] = property
     }
 
-    fun event(id: String, f: PropertyBuilder.() -> Unit = {}) {
-        val property = PropertyBuilder(id, Property.Kind.EVENT).apply(f).build()
+    fun event(id: String) {
+        val property = EventProperty(id)
         validateNewProperty(property)
         properties[id] = property
     }
 
-    fun command(id: String, f: PropertyBuilder.() -> Unit = {}) {
-        val property = PropertyBuilder(id, Property.Kind.COMMAND).apply(f).build()
+    fun command(id: String) {
+        val property = CommandProperty(id)
         validateNewProperty(property)
         properties[id] = property
     }
 
     private fun validateNewProperty(property: Property) {
         require(!properties.containsKey(property.id)) { "Property id '${property.id}' is taken." }
-        if (property.isControl()) {
-            require(property.type == null) { "Control property '${property.id}' cannot have a type." }
-        } else if (property.isData()) {
-            require(property.type != null) { "Data property '${property.id}' must have a type." }
-        }
     }
 
-    fun build() = Node(id, properties)
+    fun build() = Gate(id, properties)
+
+    companion object {
+        fun create(id: String, f: GateBuilder.() -> Unit): Gate {
+            return GateBuilder(id).apply(f).build()
+        }
+    }
 }
 
 @GraphDsl
-class PropertyBuilder(
-    private val id: String,
-    private val kind: Property.Kind,
-    private val type: DataType? = null
-) {
-    var connectable: Boolean = true
+class StructureBuilder(private val id: String) {
+    private val properties = HashMap<String, DataProperty>()
 
-    fun build() = Property(id, kind, type, connectable)
+    fun property(id: String, type: DataType) {
+        val property = DataProperty(id, Direction.OUT, type)
+        require(!properties.containsKey(property.id)) { "Property id '${property.id}' is taken." }
+        properties[id] = property
+    }
+
+    fun build() = Structure(id, properties)
+
+    companion object {
+        fun create(id: String, f: StructureBuilder.() -> Unit): Structure {
+            return StructureBuilder(id).apply(f).build()
+        }
+    }
 }

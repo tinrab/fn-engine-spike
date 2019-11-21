@@ -10,33 +10,29 @@ class BuilderTest {
     @Test
     fun basic() {
         val g = GraphBuilder.create {
-            node("action") {
+            gate("action") {
                 event("execute")
             }
-            node("text") {
-                input("value", DataType.STRING) {
-                    connectable = false
-                }
+            gate("text") {
+                input("value", DataType.STRING)
                 output("return-value", DataType.STRING)
             }
-            node("print") {
+            gate("print") {
                 command("print")
                 input("content", DataType.STRING)
+            }
+            structure("user") {
+                property("name", DataType.STRING)
             }
         }
 
         assertEquals(
-            "{\"nodes\":{\"print\":{\"id\":\"print\",\"properties\":{\"print\":{\"id\":\"print\",\"kind\":\"COMMAND\",\"connectable\":true},\"content\":{\"id\":\"content\",\"kind\":\"INPUT\",\"type\":\"STRING\",\"connectable\":true}}},\"action\":{\"id\":\"action\",\"properties\":{\"execute\":{\"id\":\"execute\",\"kind\":\"EVENT\",\"connectable\":true}}},\"text\":{\"id\":\"text\",\"properties\":{\"return-value\":{\"id\":\"return-value\",\"kind\":\"OUTPUT\",\"type\":\"STRING\",\"connectable\":true},\"value\":{\"id\":\"value\",\"kind\":\"INPUT\",\"type\":\"STRING\",\"connectable\":false}}}}}",
+            "{\"nodes\":{\"print\":{\"properties\":{\"print\":{\"id\":\"print\",\"direction\":\"IN\"},\"content\":{\"type\":\"STRING\",\"id\":\"content\",\"direction\":\"IN\"}},\"id\":\"print\"},\"action\":{\"properties\":{\"execute\":{\"id\":\"execute\",\"direction\":\"OUT\"}},\"id\":\"action\"},\"text\":{\"properties\":{\"return-value\":{\"type\":\"STRING\",\"id\":\"return-value\",\"direction\":\"OUT\"},\"value\":{\"type\":\"STRING\",\"id\":\"value\",\"direction\":\"IN\"}},\"id\":\"text\"},\"user\":{\"properties\":{\"name\":{\"type\":\"STRING\",\"id\":\"name\",\"direction\":\"OUT\"}},\"id\":\"user\"}}}",
             JsonUtil.encode(g)
         )
 
-        val f = FlowBuilder.with(g) {
-            addNode("action", "a1")
-            addNode("print", "p1")
-            addNode("text", "t1") {
-                setProperty("value", Value.createString("Hello"))
-            }
+        val f = FlowBuilder.create {
+            gate("action", "a1")
         }
-        println(JsonUtil.encode(f))
     }
 }
