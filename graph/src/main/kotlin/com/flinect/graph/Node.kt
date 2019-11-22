@@ -1,7 +1,9 @@
 package com.flinect.graph
 
+typealias NodeId = String
+
 abstract class Node(
-    val id: String
+    val id: NodeId
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

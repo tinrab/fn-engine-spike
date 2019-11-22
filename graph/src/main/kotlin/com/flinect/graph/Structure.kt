@@ -1,6 +1,6 @@
 package com.flinect.graph
 
 class Structure(
-    id: String,
-    val properties: Map<String, DataProperty>
+    id: NodeId,
+    val properties: Map<PropertyId, DataProperty>
 ) : Node(id)

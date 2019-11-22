@@ -1,11 +1,13 @@
 package com.flinect.graph.flow
 
+import com.flinect.graph.Property
+
 class Hook(
     val nodeInstance: NodeInstance,
-    val propertyId: String
+    val property: Property
 ) {
     val key: String
-        get() = "${nodeInstance}#${propertyId}"
+        get() = "${nodeInstance}@${property.id}"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

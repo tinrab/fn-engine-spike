@@ -1,6 +1,6 @@
 package com.flinect.graph
 
 class Gate(
-    id: String,
-    val properties: Map<String, Property>
+    id: NodeId,
+    val properties: Map<PropertyId, Property>
 ) : Node(id)

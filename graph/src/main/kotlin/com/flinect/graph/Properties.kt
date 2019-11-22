@@ -1,18 +1,20 @@
 package com.flinect.graph
 
-import com.flinect.graph.flow.Value
+import com.flinect.graph.value.Value
 
-abstract class Property(val id: String, val direction: Direction)
+typealias PropertyId = String
 
-abstract class ControlProperty(id: String, direction: Direction) : Property(id, direction)
+abstract class Property(val id: PropertyId, val direction: Direction)
+
+abstract class ControlProperty(id: PropertyId, direction: Direction) : Property(id, direction)
 
 class DataProperty(
-    id: String,
+    id: PropertyId,
     direction: Direction,
     val type: DataType,
     val defaultValue: Value? = null
 ) : Property(id, direction)
 
-class EventProperty(id: String) : ControlProperty(id, Direction.OUT)
+class EventProperty(id: PropertyId) : ControlProperty(id, Direction.OUT)
 
-class CommandProperty(id: String) : ControlProperty(id, Direction.IN)
+class CommandProperty(id: PropertyId) : ControlProperty(id, Direction.IN)
