@@ -1,4 +1,4 @@
-package com.flinect.graph.flow
+package com.flinect.graph
 
 class EdgeMap {
     private val edgeMap = HashMap<String, Edge>()

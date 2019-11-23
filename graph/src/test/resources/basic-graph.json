@@ -1,0 +1,44 @@
+{
+  "nodes": [
+    {
+      "id": "action",
+      "key": "a1"
+    },
+    {
+      "id": "user",
+      "key": "u1",
+      "values": [
+        {
+          "id": "name",
+          "value": "John Oldman"
+        }
+      ]
+    },
+    {
+      "id": "print",
+      "key": "p1"
+    }
+  ],
+  "edges": [
+    {
+      "source": {
+        "nodeKey": "a1",
+        "propertyId": "execute"
+      },
+      "target": {
+        "nodeKey": "p1",
+        "propertyId": "print"
+      }
+    },
+    {
+      "source": {
+        "nodeKey": "u1",
+        "propertyId": "name"
+      },
+      "target": {
+        "nodeKey": "p1",
+        "propertyId": "content"
+      }
+    }
+  ]
+}

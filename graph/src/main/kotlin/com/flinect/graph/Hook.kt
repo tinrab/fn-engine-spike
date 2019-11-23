@@ -1,6 +1,4 @@
-package com.flinect.graph.flow
-
-import com.flinect.graph.Property
+package com.flinect.graph
 
 class Hook(
     val nodeInstance: NodeInstance,

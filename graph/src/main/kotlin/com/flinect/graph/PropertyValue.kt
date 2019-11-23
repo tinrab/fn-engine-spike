@@ -1,6 +1,5 @@
-package com.flinect.graph.flow
+package com.flinect.graph
 
-import com.flinect.graph.Property
 import com.flinect.graph.value.Value
 
 class PropertyValue(

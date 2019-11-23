@@ -1,4 +1,4 @@
-package com.flinect.graph.flow
+package com.flinect.graph
 
 class Edge(
     val source: Hook,

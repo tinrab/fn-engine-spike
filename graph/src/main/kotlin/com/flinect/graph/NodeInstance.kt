@@ -1,6 +1,4 @@
-package com.flinect.graph.flow
-
-import com.flinect.graph.NodeId
+package com.flinect.graph
 
 abstract class NodeInstance(
     val id: NodeId,
