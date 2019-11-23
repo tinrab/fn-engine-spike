@@ -5,11 +5,13 @@ class SchemaBuilder private constructor() {
     private val nodes = HashMap<String, Node>()
 
     fun gate(id: String, f: GateBuilder.() -> Unit = {}) {
+        require(GraphUtil.isValidId(id)) { "Invalid node id '$id'." }
         require(!nodes.containsKey(id)) { "Node id '$id' is taken." }
         nodes[id] = GateBuilder.create(id, f)
     }
 
     fun structure(id: String, f: StructureBuilder.() -> Unit = {}) {
+        require(GraphUtil.isValidId(id)) { "Invalid node id '$id'." }
         require(!nodes.containsKey(id)) { "Node id '$id' is taken." }
         nodes[id] = StructureBuilder.create(id, f)
     }
@@ -52,6 +54,7 @@ class GateBuilder(private val id: String) {
     }
 
     private fun validateNewProperty(property: Property) {
+        require(GraphUtil.isValidId(property.id)) { "Invalid property id '${property.id}'." }
         require(!properties.containsKey(property.id)) { "Property id '${property.id}' is taken." }
     }
 
@@ -69,8 +72,9 @@ class StructureBuilder(private val id: String) {
     private val properties = HashMap<String, DataProperty>()
 
     fun property(id: String, type: DataType) {
+        require(GraphUtil.isValidId(id)) { "Invalid property id '$id'." }
+        require(!properties.containsKey(id)) { "Property id '$id' is taken." }
         val property = DataProperty(id, Direction.OUT, type)
-        require(!properties.containsKey(property.id)) { "Property id '${property.id}' is taken." }
         properties[id] = property
     }
 
