@@ -1,7 +1,6 @@
 package com.flinect.graph
 
 object GraphUtil {
-    //    private val idRegex = Regex("[a-z]+[a-z-.]*[a-z]+")
     private val idRegex = Regex("^[a-z]+(?:[.-][a-z]+)*$")
 
     fun isValidId(id: String): Boolean {

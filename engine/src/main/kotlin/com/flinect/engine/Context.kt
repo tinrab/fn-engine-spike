@@ -1,5 +1,11 @@
 package com.flinect.engine
 
-class Context(
-    val requestId: String
+import com.flinect.graph.Graph
+import com.flinect.graph.NodeInstance
+
+data class Context(
+    val graph: Graph,
+    val currentNode: NodeInstance,
+    val state: State = State(),
+    val tracer: Tracer = Tracer()
 )

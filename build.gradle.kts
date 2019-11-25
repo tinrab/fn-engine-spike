@@ -4,14 +4,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val kotlinVersion: String = property("kotlin-version").toString()
 
 plugins {
-    kotlin("jvm") version "1.3.50"
+    kotlin("jvm") version "1.3.60"
     `maven-publish`
     publishing
     id("com.diffplug.gradle.spotless") version "3.26.0"
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     jcenter()
 }
@@ -25,14 +24,6 @@ subprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven {
-            name = "GitHubPackages"
-            url = uri(property("maven-repository").toString())
-            credentials {
-                username = project.findProperty("github.user") as String? ?: System.getenv("GITHUB_USER")
-                password = project.findProperty("github.token") as String? ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
     }
 
     dependencies {

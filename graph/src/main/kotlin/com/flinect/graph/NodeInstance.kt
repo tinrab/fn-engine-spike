@@ -1,11 +1,12 @@
 package com.flinect.graph
 
-abstract class NodeInstance(
-    val id: NodeId,
-    val key: String
+class NodeInstance(
+    val node: Node,
+    val key: String,
+    val values: Map<PropertyId, PropertyValue>
 ) {
     override fun toString(): String {
-        return "$id#$key"
+        return "${node.id}@$key"
     }
 
     override fun equals(other: Any?): Boolean {

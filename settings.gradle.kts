@@ -1,4 +1,4 @@
-rootProject.name = "workflow"
+rootProject.name = "engine"
 
 include(
     "graph",

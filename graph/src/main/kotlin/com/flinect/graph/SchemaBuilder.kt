@@ -4,16 +4,10 @@ package com.flinect.graph
 class SchemaBuilder private constructor() {
     private val nodes = HashMap<String, Node>()
 
-    fun gate(id: String, f: GateBuilder.() -> Unit = {}) {
+    fun node(id: String, f: NodeBuilder.() -> Unit = {}) {
         require(GraphUtil.isValidId(id)) { "Invalid node id '$id'." }
         require(!nodes.containsKey(id)) { "Node id '$id' is taken." }
-        nodes[id] = GateBuilder.create(id, f)
-    }
-
-    fun structure(id: String, f: StructureBuilder.() -> Unit = {}) {
-        require(GraphUtil.isValidId(id)) { "Invalid node id '$id'." }
-        require(!nodes.containsKey(id)) { "Node id '$id' is taken." }
-        nodes[id] = StructureBuilder.create(id, f)
+        nodes[id] = NodeBuilder.create(id, f)
     }
 
     private fun build() = Schema(nodes)
@@ -26,7 +20,7 @@ class SchemaBuilder private constructor() {
 }
 
 @GraphDsl
-class GateBuilder(private val id: String) {
+class NodeBuilder(private val id: String) {
     private val properties = HashMap<String, Property>()
 
     fun input(id: String, type: DataType) {
@@ -58,31 +52,11 @@ class GateBuilder(private val id: String) {
         require(!properties.containsKey(property.id)) { "Property id '${property.id}' is taken." }
     }
 
-    private fun build() = Gate(id, properties)
+    private fun build() = Node(id, properties)
 
     companion object {
-        fun create(id: String, f: GateBuilder.() -> Unit): Gate {
-            return GateBuilder(id).apply(f).build()
-        }
-    }
-}
-
-@GraphDsl
-class StructureBuilder(private val id: String) {
-    private val properties = HashMap<String, DataProperty>()
-
-    fun property(id: String, type: DataType) {
-        require(GraphUtil.isValidId(id)) { "Invalid property id '$id'." }
-        require(!properties.containsKey(id)) { "Property id '$id' is taken." }
-        val property = DataProperty(id, Direction.OUT, type)
-        properties[id] = property
-    }
-
-    private fun build() = Structure(id, properties)
-
-    companion object {
-        fun create(id: String, f: StructureBuilder.() -> Unit): Structure {
-            return StructureBuilder(id).apply(f).build()
+        fun create(id: String, f: NodeBuilder.() -> Unit): Node {
+            return NodeBuilder(id).apply(f).build()
         }
     }
 }

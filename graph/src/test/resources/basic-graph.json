@@ -5,12 +5,12 @@
       "key": "a1"
     },
     {
-      "id": "user",
-      "key": "u1",
+      "id": "text",
+      "key": "t1",
       "values": [
         {
-          "id": "name",
-          "value": "John Oldman"
+          "id": "value",
+          "value": "Hello"
         }
       ]
     },
@@ -32,8 +32,8 @@
     },
     {
       "source": {
-        "nodeKey": "u1",
-        "propertyId": "name"
+        "nodeKey": "t1",
+        "propertyId": "out-value"
       },
       "target": {
         "nodeKey": "p1",

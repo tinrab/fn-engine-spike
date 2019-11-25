@@ -2,8 +2,9 @@ package com.flinect.graph
 
 typealias NodeId = String
 
-abstract class Node(
-    val id: NodeId
+class Node(
+    val id: NodeId,
+    val properties: Map<PropertyId, Property>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

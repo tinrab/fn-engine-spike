@@ -1,7 +1,7 @@
 package com.flinect.graph
 
 import com.flinect.graph.value.Value
-import com.flinect.scrap.common.JsonUtil
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import java.io.Reader
@@ -19,24 +19,7 @@ class Parser private constructor(
         val node = schema.nodes[id]
         requireNotNull(node) { "Node with id '$id' not found." }
 
-        when (node) {
-            is Gate -> buildGate(id, key, json)
-            is Structure -> buildStructure(id, key, json)
-        }
-    }
-
-    private fun buildGate(id: String, key: String, json: JsonObject) {
-        graphBuilder.gate(id, key) {
-            for (value in getValues(json)) {
-                val property = property(value["id"].asString)
-                require(property is DataProperty) { "Cannot assign a value to '${property.id}' property of gate '$id'." }
-                property assign parseValue(property.type, value["value"])
-            }
-        }
-    }
-
-    private fun buildStructure(id: String, key: String, json: JsonObject) {
-        graphBuilder.structure(id, key) {
+        graphBuilder.node(id, key) {
             for (value in getValues(json)) {
                 val property = property(value["id"].asString)
                 require(property is DataProperty) { "Cannot assign a value to '${property.id}' property of gate '$id'." }
@@ -101,12 +84,14 @@ class Parser private constructor(
     }
 
     companion object {
+        private val gson = GsonBuilder().create()
+
         fun fromJson(schema: Schema, json: String): Graph {
             return fromJson(schema, StringReader(json))
         }
 
         fun fromJson(schema: Schema, reader: Reader): Graph {
-            val jsonObject = JsonUtil.decode(reader, JsonObject::class).asJsonObject
+            val jsonObject = gson.fromJson(reader, JsonObject::class.java).asJsonObject
             return Parser(schema).build(jsonObject)
         }
     }

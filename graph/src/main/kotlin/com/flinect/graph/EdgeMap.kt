@@ -2,30 +2,32 @@ package com.flinect.graph
 
 class EdgeMap {
     private val edgeMap = HashMap<String, Edge>()
-    private val inputs = HashMap<String, Edge>()
-    private val outputs = HashMap<String, MutableList<Edge>>()
+    private val inputs = HashMap<String, Hook>()
+    private val outputs = HashMap<String, MutableList<Hook>>()
 
     val edges: Collection<Edge>
         get() = edgeMap.values
 
     internal fun put(e: Edge) {
         edgeMap[getKey(e)] = e
-        inputs[e.target.key] = e
+
+        inputs[e.target.key] = e.source
         if (!outputs.containsKey(e.source.key)) {
             outputs[e.source.key] = arrayListOf()
         }
-        outputs[e.source.key]?.add(e)
+
+        outputs[e.source.key]?.add(e.target)
     }
 
     operator fun get(source: Hook, target: Hook): Edge? {
         return edgeMap[getKey(source, target)]
     }
 
-    fun getInput(target: Hook): Edge? {
+    fun getInput(target: Hook): Hook? {
         return inputs[target.key]
     }
 
-    fun getOutputs(source: Hook): List<Edge> {
+    fun getOutputs(source: Hook): List<Hook> {
         return outputs[source.key] ?: emptyList()
     }
 
