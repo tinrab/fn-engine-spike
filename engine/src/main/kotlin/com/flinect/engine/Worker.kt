@@ -10,9 +10,10 @@ abstract class Worker(
     private val engine: Engine
 ) : CoroutineScope by scope {
     val workerId = nextWorkerId.incrementAndGet()
+    lateinit var router: Router
 
     internal suspend fun start(inbound: ReceiveChannel<Instruction>) {
-        val router = buildRouter()
+        router = buildRouter()
 
         for (instruction in inbound) {
             instruction.context.tracer.workerReceivedInstruction(instruction)
@@ -57,7 +58,7 @@ abstract class Worker(
     }
 
     protected fun readInput(context: Context, propertyId: PropertyId) {
-        
+
     }
 
     companion object {

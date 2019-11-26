@@ -36,7 +36,7 @@ class GraphBuilderTest {
             val b1 = node("b", "b1") {
                 property("input-integer") assign Value.of(42)
             }
-            val c1 =node("c", "c1")
+            val c1 = node("c", "c1")
 
             property(a1, "event") connectTo property(b1, "command")
             property(b1, "event") connectTo property(c1, "command")
