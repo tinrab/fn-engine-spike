@@ -1,8 +1,15 @@
 package com.flinect.engine
 
-import com.flinect.graph.*
+import com.flinect.graph.CommandProperty
+import com.flinect.graph.DataProperty
+import com.flinect.graph.Direction
+import com.flinect.graph.EventProperty
+import com.flinect.graph.Hook
+import com.flinect.graph.NodeId
+import com.flinect.graph.PropertyId
+import com.flinect.graph.value.Value
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.Channel
 import java.util.concurrent.atomic.AtomicLong
 
 abstract class Worker(
@@ -10,26 +17,51 @@ abstract class Worker(
     private val engine: Engine
 ) : CoroutineScope by scope {
     val workerId = nextWorkerId.incrementAndGet()
-    lateinit var router: Router
+    private lateinit var router: Router
 
-    internal suspend fun start(inbound: ReceiveChannel<Instruction>) {
+    internal suspend fun start(messageChannel: Channel<Message>) {
         router = buildRouter()
 
-        for (instruction in inbound) {
-            instruction.context.tracer.workerReceivedInstruction(instruction)
-
-            val handler = router.getCommandHandler(instruction.context.currentNode.node.id, instruction.commandId)
-            if (handler != null) {
-                instruction.context.tracer.instructionPassedToHandler(instruction, instruction.context.currentNode.node)
-                handler(instruction.context)
+        for (message in messageChannel) {
+            when (message) {
+                is Instruction -> handleInstruction(message)
+                is Query -> handleQuery(message)
+                is QueryResulted -> handleQueryResulted(message)
             }
         }
+    }
+
+    private fun handleInstruction(instruction: Instruction) {
+        val handler = router.getCommandHandler(instruction.context.currentNode.node.id, instruction.commandId)
+        if (handler != null) {
+            handler(instruction.context)
+        }
+    }
+
+    private suspend fun handleQuery(query: Query) {
+        val handler = router.getValueProvider(query.context.currentNode.node.id, query.propertyId)
+        if (handler != null) {
+            val value = handler(query.context)
+            val result = QueryResulted(
+                context = query.context.copy(currentNode = query.senderNode),
+                value = value,
+                senderWorkerId = query.senderWorkerId
+            )
+            engine.broadcast(result)
+        }
+    }
+
+    private fun handleQueryResulted(queryResulted: QueryResulted) {
+        // TODO: Maybe set values for other workers as well
+        if (workerId != queryResulted.senderWorkerId) {
+            return
+        }
+        println(queryResulted.value)
     }
 
     protected abstract fun buildRouter(): Router
 
     protected open fun trigger(context: Context, event: EventReference) {
-        context.tracer.eventTriggered(event)
         // Broadcast to outputs
         val outputs = context.graph.edges.getOutputs(Hook(context.currentNode, event.property))
         for (output in outputs) {
@@ -38,9 +70,22 @@ abstract class Worker(
                 commandId = output.property.id
             )
 
-            context.tracer.broadcastInstruction(instruction)
             engine.broadcast(instruction)
         }
+    }
+
+    protected fun readInput(context: Context, input: InputReference): Value {
+        val hook = context.graph.edges.getInput(Hook(context.currentNode, input.property))
+        checkNotNull(hook)
+
+        val query = Query(
+            context = context.copy(currentNode = hook.nodeInstance),
+            propertyId = hook.property.id,
+            senderNode = context.currentNode,
+            senderWorkerId = workerId
+        )
+        engine.broadcast(query)
+
     }
 
     protected fun getCommand(nodeId: NodeId, propertyId: PropertyId): CommandReference {
@@ -57,8 +102,20 @@ abstract class Worker(
         return EventReference(node, property)
     }
 
-    protected fun readInput(context: Context, propertyId: PropertyId) {
+    protected fun getInput(nodeId: NodeId, propertyId: PropertyId): InputReference {
+        val node = checkNotNull(engine.schema.nodes[nodeId])
+        val property = checkNotNull(node.properties[propertyId])
+        check(property is DataProperty)
+        check(property.direction == Direction.IN)
+        return InputReference(node, property)
+    }
 
+    protected fun getOutput(nodeId: NodeId, propertyId: PropertyId): OutputReference {
+        val node = checkNotNull(engine.schema.nodes[nodeId])
+        val property = checkNotNull(node.properties[propertyId])
+        check(property is DataProperty)
+        check(property.direction == Direction.OUT)
+        return OutputReference(node, property)
     }
 
     companion object {

@@ -7,8 +7,12 @@ import com.flinect.engine.worker.PrinterWorker
 import com.flinect.engine.worker.RepeatWorker
 import com.flinect.graph.Graph
 import com.flinect.graph.Schema
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newFixedThreadPoolContext
+import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.CoroutineContext
 
 class Engine(
@@ -16,7 +20,7 @@ class Engine(
     val schema: Schema
 ) : CoroutineScope {
     private val _coroutineContext: CoroutineContext
-    private val outboundChannels = ArrayList<Channel<Instruction>>()
+    private val messageChannels = ArrayList<Channel<Message>>()
 
     override val coroutineContext: CoroutineContext
         get() = _coroutineContext
@@ -37,8 +41,7 @@ class Engine(
         repeat(100000000) {
             val context = Context(
                 graph = graph,
-                currentNode = graph.nodes["a1"]!!,
-                tracer = Tracer()
+                currentNode = graph.nodes["a1"]!!
             )
             broadcast(Instruction(context, "trigger"))
             delay(3000)
@@ -47,22 +50,21 @@ class Engine(
         delay(1000000000000000000)
     }
 
-    internal fun broadcast(instruction: Instruction) {
+    internal fun broadcast(message: Message) {
         launch {
-            for (outbound in outboundChannels) {
-                instruction.context.tracer.sentToWorker(instruction)
-                outbound.send(instruction)
+            for (messageChannel in messageChannels) {
+                messageChannel.send(message)
             }
         }
     }
 
     private fun startWorker(factory: (scope: CoroutineScope) -> Worker) {
-        val inbound = Channel<Instruction>()
-        outboundChannels.add(inbound)
+        val messageChannel = Channel<Message>()
+        messageChannels.add(messageChannel)
 
         repeat(engineConfig.workerConfig.poolSize) {
             launch {
-                factory(this).start(inbound)
+                factory(this).start(messageChannel)
             }
         }
     }

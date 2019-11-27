@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val kotlinVersion: String = property("kotlin-version").toString()
 
 plugins {
-    kotlin("jvm") version "1.3.60"
+    kotlin("jvm") version "1.3.61"
     `maven-publish`
     publishing
     id("com.diffplug.gradle.spotless") version "3.26.0"

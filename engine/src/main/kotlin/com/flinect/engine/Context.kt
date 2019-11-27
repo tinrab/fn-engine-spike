@@ -5,7 +5,5 @@ import com.flinect.graph.NodeInstance
 
 data class Context(
     val graph: Graph,
-    val currentNode: NodeInstance,
-    val state: State = State(),
-    val tracer: Tracer = Tracer()
+    val currentNode: NodeInstance
 )

@@ -2,10 +2,10 @@ package com.flinect.engine
 
 import com.flinect.graph.PropertyId
 
-data class Instruction(
-    val context: Context,
+class Instruction(
+    context: Context,
     val commandId: PropertyId
-) {
+) : Message(context) {
     override fun toString(): String {
         return "Instruction(node=${context.currentNode}, commandId=$commandId)"
     }

@@ -10,6 +10,7 @@ class PrinterWorker(
     scope: CoroutineScope,
     engine: Engine
 ) : Worker(scope, engine) {
+    private val contentInput = getInput("printer", "content")
     private val printCommand = getCommand("printer", "print")
 
     override fun buildRouter(): Router {
@@ -18,7 +19,6 @@ class PrinterWorker(
     }
 
     private fun handlePrint(context: Context) {
-        val content = readInput(context, "content")
-        println(content)
+        val content = readInput(context, contentInput)
     }
 }
